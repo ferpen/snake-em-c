@@ -12,10 +12,13 @@ void main(int argc, char *argv[] ){
         case 1:
         draw();
         imput();
-        logic();
         Sleep(100);
+        logic();
         break;
+
+        case 2:
+        config();
     }
  
-    }while (game!=2);
+    }while (game!=3);
 }

@@ -11,7 +11,7 @@ void move();
 void criakobra();
 void aumentakobra(kobra *corpo);
 void movekobra(kobra *corpo);
-int mordekobra(kobra *corpo);
+void mordekobra(kobra *corpo);
 void libera(kobra *corpo);
 
 //estrutura da cobra
@@ -38,25 +38,27 @@ void cnfg(){
 //funcionamento do jogo
 void logic(){
     int x;
-    //move a cobra 
+    
+    //move a cobra
     move();
 
     //caso bata na borda
-    //if(player.posi[1]==0|| player.posi[1]==hei-1 || player.posi[0]==0 || player.posi[0]==wid-1)
-    //finalize();
+    if(player.posi[1]==-1|| player.posi[1]==hei || player.posi[0]==-1 || player.posi[0]==wid)
+    finalize();
 
     //caso pegue a fruta
     if(player.posi[0]==frut[0]&&player.posi[1]==frut[1]){
     score++;
     gerafrut();
-    if (score == 1)
+    if (player.filho == NULL){
     criakobra();
+    }
     else
     aumentakobra(player.filho);
     }
-    if (player.filho!= NULL && (x=mordekobra(player.filho) == 1)){
-    finalize();
-    }
+    if (player.filho!= NULL)
+    mordekobra(player.filho);
+    
 }
 
 //termina o jogo
@@ -79,12 +81,9 @@ void finalize(){
 
 //gera a posição da fruta
 void gerafrut(){
-    int s1=hei-1,s2=wid-1;
     srand(time(NULL));
-    frut[0]=rand()%s1;
-    frut[1]=rand()%s2; 
-    //if (frut[0] == 0 || frut[1] == 0) 
-    //gerafrut();
+    frut[0]=rand()%hei;
+    frut[1]=rand()%wid; 
 }
 
 //move a cobra
@@ -108,15 +107,12 @@ void move(){
     
 }
 
-//cria a orimeira seção do corpo
-void criakobra(){
-    player.filho = malloc(sizeof(kobra));
-}
-
 //aumenta o tamango do corpo
 void aumentakobra(kobra *corpo){
-   if (corpo->filho==NULL)
+   if (corpo->filho==NULL){
     corpo->filho= malloc(sizeof(kobra));
+    corpo->filho->filho=NULL;
+   }
    else
    aumentakobra(corpo->filho);
 }
@@ -130,20 +126,18 @@ void movekobra (kobra *corpo){
     }
 
     }
+    //cria o corpo
+    void criakobra(){
+        player.filho=malloc(sizeof(kobra));
+        player.filho->filho=NULL;
+    }
 
     //confere se a cobra se mordeu
-    int mordekobra(kobra *corpo){
-        int x;
-        if (corpo->filho !=NULL)
-        x=mordekobra(corpo->filho);
-
-        if (x==1)
-        return 1;
-
-        if (player.posi[0] == corpo->posi[0] && player.posi[1] == corpo->posi[1])
-        return 1;
-
-        return 0;
+    void mordekobra(kobra *corpo){
+        if (corpo->filho != NULL)
+        mordekobra(corpo->filho);
+        if((corpo->posi[1]==player.posi[1]) && (corpo->posi[0]==player.posi[0]))
+        finalize();
     }
 
     //libera memória
@@ -152,4 +146,7 @@ void movekobra (kobra *corpo){
         libera (corpo->filho);
 
         free(corpo);
+
+        if (corpo->filho != NULL)
+        corpo->filho = NULL;
     }
